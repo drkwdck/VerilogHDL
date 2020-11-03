@@ -1,9 +1,9 @@
 module ALU(
-input [3:0]   operator_i,
-input [31:0]  operator_a_i,
-input [31:0]  operator_b_i,
-output reg [31:0] result_o,
-output reg        comparison_result_o
+input [3:0] operator,
+input [31:0] left,
+input [31:0] right,
+output reg [31:0] result,
+output reg comparison
 );
 
 localparam ALU_ADD = 4'b0000;
@@ -26,60 +26,60 @@ localparam ALU_EQ = 4'b1100;
 localparam ALU_NE = 4'b1101;
 
 always@(*) begin
-	case (operator_i)
+	case (operator)
 	ALU_ADD: begin 
-		result_o = operator_a_i + operator_b_i; comparison_result_o = 0; 
+		result = left + right; comparison = 0; 
 		end
 	ALU_SUB: begin 
-		result_o = operator_a_i - operator_b_i; comparison_result_o = 0; 
+		result = left - right; comparison = 0; 
 		end
 
 	ALU_XOR: begin 
-		result_o = operator_a_i ^ operator_b_i; comparison_result_o = 0; 
+		result = left ^ right; comparison = 0; 
 		end
 
 	ALU_OR: begin 
-		result_o = operator_a_i | operator_b_i; comparison_result_o = 0; 
+		result = left | right; comparison = 0; 
 		end
 
 	ALU_AND: begin 
-		result_o = operator_a_i & operator_b_i; comparison_result_o = 0; 
+		result = left & right; comparison = 0; 
 		end
 
 	ALU_SRA: begin 
-		result_o = $signed(operator_a_i) >>> operator_b_i; comparison_result_o = 0; 
+		result = $signed(left) >>> right; comparison = 0; 
 		end
 
 	ALU_SRL: begin 
-		result_o = operator_a_i >> operator_b_i; comparison_result_o = 0; 
+		result = left >> right; comparison = 0; 
 		end
 
 	ALU_SLL: begin 
-		result_o = operator_a_i << operator_b_i; comparison_result_o = 0; 
+		result = left << right; comparison = 0; 
 		end
 
 	ALU_LTS: begin 
-		result_o = ($signed(operator_a_i) < $signed(operator_b_i)) ? 1:0 ; comparison_result_o = result_o; 
+		result = ($signed(left) < $signed(right)) ? 1:0 ; comparison = result; 
 		end
 
 	ALU_LTU: begin 
-		result_o = (operator_a_i < operator_b_i) ? 1:0 ; comparison_result_o = result_o; 
+		result = (left < right) ? 1:0 ; comparison = result; 
 		end
 
 	ALU_GES: begin 
-		result_o = ($signed(operator_a_i) >= $signed(operator_b_i)) ? 1:0 ; comparison_result_o = result_o; 
+		result = ($signed(left) >= $signed(right)) ? 1:0 ; comparison = result; 
 		end
 
 	ALU_GEU: begin 
-		result_o = (operator_a_i >= operator_b_i) ? 1:0 ; comparison_result_o = result_o; 
+		result = (left >= right) ? 1:0 ; comparison = result; 
 		end
 
 	ALU_EQ: begin 
-		result_o = (operator_a_i == operator_b_i) ? 1:0 ; comparison_result_o = result_o; 
+		result = (left == right) ? 1:0 ; comparison = result; 
 		end
 
 	ALU_NE: begin 
-		result_o = (operator_a_i != operator_b_i) ? 1:0 ; comparison_result_o = result_o; 
+		result = (left != right) ? 1:0 ; comparison = result; 
 		end
 		
 	endcase
