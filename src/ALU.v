@@ -37,9 +37,11 @@ always@(*) begin
 	ALU_XOR: begin 
 		result_o = operator_a_i ^ operator_b_i; comparison_result_o = 0; 
 		end
+
 	ALU_OR: begin 
 		result_o = operator_a_i | operator_b_i; comparison_result_o = 0; 
 		end
+
 	ALU_AND: begin 
 		result_o = operator_a_i & operator_b_i; comparison_result_o = 0; 
 		end
@@ -47,9 +49,11 @@ always@(*) begin
 	ALU_SRA: begin 
 		result_o = $signed(operator_a_i) >>> operator_b_i; comparison_result_o = 0; 
 		end
+
 	ALU_SRL: begin 
 		result_o = operator_a_i >> operator_b_i; comparison_result_o = 0; 
 		end
+
 	ALU_SLL: begin 
 		result_o = operator_a_i << operator_b_i; comparison_result_o = 0; 
 		end
@@ -57,12 +61,15 @@ always@(*) begin
 	ALU_LTS: begin 
 		result_o = ($signed(operator_a_i) < $signed(operator_b_i)) ? 1:0 ; comparison_result_o = result_o; 
 		end
+
 	ALU_LTU: begin 
 		result_o = (operator_a_i < operator_b_i) ? 1:0 ; comparison_result_o = result_o; 
 		end
+
 	ALU_GES: begin 
 		result_o = ($signed(operator_a_i) >= $signed(operator_b_i)) ? 1:0 ; comparison_result_o = result_o; 
 		end
+
 	ALU_GEU: begin 
 		result_o = (operator_a_i >= operator_b_i) ? 1:0 ; comparison_result_o = result_o; 
 		end
@@ -70,6 +77,7 @@ always@(*) begin
 	ALU_EQ: begin 
 		result_o = (operator_a_i == operator_b_i) ? 1:0 ; comparison_result_o = result_o; 
 		end
+
 	ALU_NE: begin 
 		result_o = (operator_a_i != operator_b_i) ? 1:0 ; comparison_result_o = result_o; 
 		end
