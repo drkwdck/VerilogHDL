@@ -1,6 +1,6 @@
 module InstructionMemory 
   #(
-    parameter HIGHT = 4
+    parameter HIGHT = 8
   )
   (
     input [31:0]  adress,
