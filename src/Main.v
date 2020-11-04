@@ -1,84 +1,111 @@
-module Main 
-#(
-	parameter HIGHT = 8
-)
-(
- input clk_i,
- input rst_i,
- input [31:0] SW,
- output [31:0] HEX
+module Main (
+input         clk,
+input			  rst,
+//input 			WE,
+input [31:0] SW,
+output [31:0] HEX
 );
 
-wire B;
-wire C;
-wire WE;
-wire [1:0] WS ;
-wire [7:0] const;
-reg signed [31:0] PC;
-wire [31:0] current_instruction;
-wire [31:0] SE_SW;
-reg  [31:0] count;
+reg  [31:0] PC;
+reg [31:0] mux3in1;
+wire [31:0] instr;
+wire [31:0] RD1;
+wire [31:0] RD2;
+wire [31:0] aluresult;
+wire comparison_result_o;
+wire [31:0] SE;
 
-//Алу
-wire [31:0] RD_1; // left    RD1_o
-wire [31:0] RD_2; // right    RD2_o
-wire [31:0] operation_result; // result
-wire comparison_result_operation; // comparison
-
-//Регистровый файл
-reg [31:0] WD3;
-
-RF rigster_file_instnc (
-	.clk ( clk_i ),
-	.reset ( rst_i ),
-	.A1 ( current_instruction[22:18] ),
-	.A2 ( current_instruction[17:13] ),
-	.A3 ( current_instruction[12:8] ),
-	.WD3 ( WD3 ),
-	.WE ( current_instruction[29] ),
-	.RD1 ( RD_1 ),
-	.RD2 ( RD_2 )
-); 
-
-InstructionMemory instruction_memory_instnc (
-.adress ( PC ),
-.RD ( current_instruction )
+InstructionMemory inst_datamemory(
+	.clk(clk),
+	.A(PC),
+	.RD(instr),
+	.WE(WE)
 );
 
-ALU alu_instnc (
-.operator ( current_instruction[26:23] ),
-.left ( RD_1 ),
-.right ( RD_2 ),
-.result ( operation_result ),
-.comparison ( comparison_result_operation )
+RF inst_regfile(
+	.clk(clk),
+	.reset(rst),
+	.A1(instr[22:18]),
+	.A2(instr[17:13]),
+	.A3(instr[12:8]),
+	.WD3(mux3in1),
+	.WE(instr[29]),
+	.RD1(RD1),
+	.RD2(RD2)
+);
+	
+ALU ALUop(
+	.operator(instr[26:23]),
+	.left(RD1),
+	.right(RD2),
+	.result(aluresult),
+	.comparison(comparison_result_o)
 );
 
-//производим знакорасширение
-assign const = current_instruction[7:0];
-assign SE    = {{24{const[7]} }, const};
+SE se(
+	.A(instr[7:0]),
+	.result(SE)
+);
 
-//реализация WS
-always @ (*) begin
-	case (WS)
-		2'b00 : WD3 <= SE;
-		2'b01 : WD3 <= SE_SW; 
-		2'b10 : WD3 <= operation_result;
-		2'b11 : WD3 <= 32'b0;
+assign HEX=RD1;
+always @(*)
+begin
+		case(instr[28:27])
+		2'b00: begin
+			mux3in1<=SE[31:0];
+		end
+		2'b01: begin
+			mux3in1<=SW[31:0];
+		end
+		2'b10: begin
+			mux3in1<=aluresult;
+		end
 	endcase
 end
 
-always @ ( posedge clk_i ) begin
-	if ( rst_i ) begin
-	  PC <= 32'b0;
-	  count <= 32'b0;
-	end
-
-	if (current_instruction[31] == 1) PC <= $signed(PC + $signed(const));
-	else begin 
-	  if ((current_instruction[30] == 1) && (comparison_result_operation == 1)) PC <= $signed(PC + $signed(const));
-     else PC <= $signed(PC + $signed(32'd1));
-   end
+always @(posedge clk)
+ begin
+	if (rst)
+		PC <= 32'd0;
+	else if ((instr[31:30]==0)||((instr[30]==1)&&(instr[31]==0)&&(comparison_result_o==0)))
+		PC <= PC+32'd4 ; 
+	else
+		PC<=PC + (SE[31:0] << 2);
 end
 
-endmodule 
 
+
+
+
+
+//
+//always @(posedge clk) begin
+//	if (rst)
+//		PC <= 32'd0;
+//	else
+//	if (instr[31:30]<=0||(instr[]
+//		PC <= PC+32'd4 ; 
+//		
+//end
+
+
+//case(instr[31:30])
+//	2'b00: begin 
+//	PC<=PC+32'd4;
+//	end
+//	2'b01: begin
+//	if (comparison_result_o==0)
+//	PC<=PC+32'd4;
+//	else
+//	PC <= PC + (SE[31:0] << 2);
+//	end
+//	2'b10: begin 
+//	PC <= PC + (SE[31:0] << 2);
+//	end
+//	2'b11: begin
+//	if(comparison_result_o==0)
+//	PC <= PC + (SE[31:0] << 2);	
+//	end
+//	endcase
+
+endmodule
