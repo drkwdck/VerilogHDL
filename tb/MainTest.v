@@ -29,7 +29,7 @@ initial begin
   forever begin
     #1500000000
     clk = ~clk;
-    // $display("%d", HEX);
+    $display("%d", HEX);
   end 
 end
 endmodule

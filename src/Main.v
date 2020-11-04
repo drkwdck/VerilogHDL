@@ -64,10 +64,8 @@ always @(posedge clk) begin
 	if (reset)
 		PC <= 32'd0;
 	else if (!((comparisonResultO && current_instruction[30]) || current_instruction[31]))
-	// else if ((current_instruction[31:30] == 0) || ((current_instruction[30]==1) && (current_instruction[31] == 0) && (comparisonResultO == 0)))
 		PC <= PC + 32'd1 ; 
 	else
 		PC <= PC + (SE[31:0]);
-	$display("PC %d", PC);
 end
 endmodule
