@@ -7,18 +7,18 @@ reg  [4:0] 	   A1;
 reg  [4:0]	   A2;
 reg  [4:0]     A3;
 reg  [31:0]    WD3;
-reg  		   WE;
+reg  		   WE3;
 wire [31:0]    RD1;
 wire [31:0]    RD2;
 
 RF reg_file(
     .clk(clk), 
-    .reset(reset), 
+    .rst(reset), 
     .A1(A1), 
     .A2(A2), 
     .A3(A3),
     .WD3(WD3),
-    .WE(WE),
+    .WE3(WE3),
     .RD1(RD1),
     .RD2(RD2)
 );
@@ -49,16 +49,16 @@ task unit_test_task;
 		A2    = A2_;
 		A3    = A3_;
 		WD3   = WD3_;
-		WE    = WE_;
+		WE3    = WE_;
 		reset = reset_;
 
 		#10;
-		$display("A1 = %d\n", A1, "A2 = %d\n", A2,"A3 = %d\n", A3, "WE = %d\n",
-			WE, "WD = %d\n", WD3, "reset = %d\n", reset_, "RD1 = %d\n", RD1, "RD2 = %d", RD2);
+		$display("A1 = %d\n", A1, "A2 = %d\n", A2,"A3 = %d\n", A3, "WE3 = %d\n",
+			WE3, "WD = %d\n", WD3, "reset = %d\n", reset, "RD1 = %d\n", RD1, "RD2 = %d", RD2);
 
 		if ((A1 == expected_A1) && (A2 == expected_A2) && (A3 == expected_A3)) begin
 			// если запись
-			if (WE) begin
+			if (WE3) begin
 				$display("good");				
 			end
 			
@@ -92,7 +92,7 @@ initial begin
 
  	// Считал
 	unit_test_task(6, 31, 6, 2 , 0, 0, // input
-	6, 31, 6, 1, 1); // expected	
+	2, 31, 6, 1, 1); // expected	
 	#10;
 
 	// reset
