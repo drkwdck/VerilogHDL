@@ -7,7 +7,8 @@ module InstructionMemory
     output [31:0] RD
   );
 
-  initial $readmemb ("File_mem.txt",RAM);
   reg [31:0] RAM [HIGHT:0];
   assign RD = RAM[adress];
+  initial $readmemb ("File_mem.txt", RAM);
+
 endmodule 

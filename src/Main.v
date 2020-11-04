@@ -14,7 +14,7 @@ wire  C;
 wire  WE;
 wire [1:0]  WS ;
 wire [7:0]  const;
-reg  [31:0] PC;
+reg signed [31:0] PC;
 wire [31:0] current_instruction;
 wire [31:0] SE_SW;
 reg  [31:0] count;
@@ -72,14 +72,14 @@ end
 //
 always @ ( posedge clk_i ) begin
 	if ( rst_i ) begin
-	  PC    	<= 32'b0;
+	  PC <= 32'b0;
 	  count <= 32'b0;
-	end 
+	end
 
-	if (current_instruction[31] == 1) PC <= PC + const;
+	if (current_instruction[31] == 1) PC <= $signed(PC + $signed(const));
 	else begin 
-	  if ((current_instruction[30] == 1) && (comparison_result_operation == 1)) PC <= PC + const;
-     else PC <= PC + 32'd1;
+	  if ((current_instruction[30] == 1) && (comparison_result_operation == 1)) PC <= $signed(PC + $signed(const));
+     else PC <= $signed(PC + $signed(32'd1));
    end
 end
 
