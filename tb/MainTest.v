@@ -6,7 +6,7 @@ module MainTest();
     reg [31:0] SW;
     wire  [31:0] HEX;
 
-    Main Prog_device_dut(clk, rst, SW, HEX);
+    Main MainUnitTest(clk, rst, SW, HEX);
 
     integer i;
     task Prog_device_task;
@@ -22,6 +22,7 @@ module MainTest();
                 #10;
                 clk = ~clk;
             end
+
             rst = 0;
             for(i = 0; i < 1000; i = i + 1) begin
                 #10;

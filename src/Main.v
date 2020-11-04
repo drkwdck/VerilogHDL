@@ -3,17 +3,17 @@ module Main
 	parameter HIGHT = 8
 )
 (
- input   clk_i,
- input   rst_i,
- input   [31:0] SW,
- output  [31:0] HEX
+ input clk_i,
+ input rst_i,
+ input [31:0] SW,
+ output [31:0] HEX
 );
 
-wire  B;
-wire  C;
-wire  WE;
-wire [1:0]  WS ;
-wire [7:0]  const;
+wire B;
+wire C;
+wire WE;
+wire [1:0] WS ;
+wire [7:0] const;
 reg signed [31:0] PC;
 wire [31:0] current_instruction;
 wire [31:0] SE_SW;
@@ -53,8 +53,6 @@ ALU alu_instnc (
 .comparison ( comparison_result_operation )
 );
 
-integer i;
-
 //производим знакорасширение
 assign const = current_instruction[7:0];
 assign SE    = {{24{const[7]} }, const};
@@ -69,7 +67,6 @@ always @ (*) begin
 	endcase
 end
 
-//
 always @ ( posedge clk_i ) begin
 	if ( rst_i ) begin
 	  PC <= 32'b0;
