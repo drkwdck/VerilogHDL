@@ -14,70 +14,85 @@
 `define ALU_NE 4'b1101
 
 module ALU(
-input [3:0] operator,
-input [31:0] left,
-input [31:0] right,
-output reg [31:0] result,
-output reg comparison
+	input [3:0] operator,
+	input [31:0] left,
+	input [31:0] right,
+	output reg [31:0] result,
+	output reg comparison
 );
-always@(*) begin
-	case (operator)
-	`ALU_ADD: begin 
-		result = left + right; comparison = 0; 
-		end
-	`ALU_SUB: begin 
-		result = left - right; comparison = 0; 
-		end
+	always@(*) begin
+			case(operator)
+				
+				`ALU_ADD: begin 
+					result = left + right;
+					comparison = 0;
+				end
+				
+				`ALU_SUB: begin
+					result = ($signed(left )-$signed( right));
+					result = $signed(result ) ;
+					comparison = 0;
+				end
 
-	`ALU_XOR: begin 
-		result = left ^ right; comparison = 0; 
-		end
+				`ALU_XOR: begin
+					result = left ^ right;
+					comparison = 0;
+				end
 
-	`ALU_OR: begin 
-		result = left | right; comparison = 0; 
-		end
+				`ALU_OR: begin
+					result = left | right;
+					comparison = 0;
+				end
 
-	`ALU_AND: begin 
-		result = left & right; comparison = 0; 
-		end
+				`ALU_AND: begin
+					result = left & right;
+					comparison = 0;
+				end
 
-	`ALU_SRA: begin 
-		result = $signed(left) >>> right; comparison = 0; 
-		end
+				`ALU_SRA: begin
+					result = ($signed(left ))>>> right;
+					comparison = 0;
+				end
 
-	`ALU_SRL: begin 
-		result = left >> right; comparison = 0; 
-		end
+				`ALU_SRL: begin
+					result = left >> right;
+					comparison = 0;
+				end
 
-	`ALU_SLL: begin 
-		result = left << right; comparison = 0; 
-		end
+				`ALU_SLL: begin
+					result = left << right;
+					comparison = 0;
+				end
 
-	`ALU_LTS: begin 
-		result = ($signed(left) < $signed(right)) ? 1:0 ; comparison = result; 
-		end
+				`ALU_LTS: begin 
+					result = (left < right)?1:0;
+					comparison = result ; 
+				end
 
-	`ALU_LTU: begin 
-		result = (left < right) ? 1:0 ; comparison = result; 
-		end
+				`ALU_LTU: begin
+					result = ($signed(left )<$signed( right))?1:0;
+					comparison = result ; 
+				end
 
-	`ALU_GES: begin 
-		result = ($signed(left) >= $signed(right)) ? 1:0 ; comparison = result; 
-		end
+				`ALU_GES: begin 
+					result = (left >= right)?1:0;
+					comparison = result ; 
+				end
 
-	`ALU_GEU: begin 
-		result = (left >= right) ? 1:0 ; comparison = result; 
-		end
+				`ALU_GEU: begin
+					result = ($signed(left )>=$signed( right))?1:0;
+					comparison = result ; 
+				end
 
-	`ALU_EQ: begin 
-		result = (left == right) ? 1:0 ; comparison = result;
-		end
+				`ALU_EQ:  begin 
+					result = (left == right)?1:0;
+					comparison = result ; 
+				end
 
-	`ALU_NE: begin 
-		result = (left != right) ? 1:0 ; comparison = result; 
-		end
-		
-	endcase
-end
-
+				`ALU_LTS: begin
+					result = (left != right)?1:0;
+					comparison = result ; 
+				end
+		endcase
+	end
 endmodule

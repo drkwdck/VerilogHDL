@@ -7,9 +7,9 @@ reg				reset;
 reg 	[31:0]		SW ;
 wire	[31:0]	HEX;
 
-all DUT(
+Main DUT(
 	.clk   ( clk   ),
-	.rst ( reset ),
+	.reset ( reset ),
 	.SW	 ( SW    ),
 	.HEX ( HEX   )
 );
