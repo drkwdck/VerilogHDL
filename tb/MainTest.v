@@ -1,4 +1,4 @@
-`timescale 1ns / 10ps
+`timescale 1ms / 1ns
 
 module MainTest();
 
@@ -18,21 +18,18 @@ initial SW = 32'd30;
 
 initial begin
   reset = 1;
-  #20;
+  #2000000000;
   reset = 0;
-  #20;
+  #2000000000;
 end
 
 initial begin
   clk = 1'b0;
 
   forever begin
-    #15 
+    #1500000000
     clk = ~clk;
-    $display("%b", HEX);
+    // $display("%d", HEX);
   end 
 end
-
-
-
 endmodule
