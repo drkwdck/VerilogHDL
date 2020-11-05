@@ -5,7 +5,7 @@
 `define ALU_AND 4'b0100
 `define ALU_SRA 4'b0101
 `define ALU_SRL 4'b0110
-`define ALU_SLL 4'b0111
+`define ALU_SLL 4'b0111	
 `define ALU_LTS 4'b1000
 `define ALU_LTU 4'b1001
 `define ALU_GES 4'b1010

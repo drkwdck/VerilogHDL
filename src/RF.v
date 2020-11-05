@@ -17,16 +17,6 @@ reg [31:0] RAM [0:31];
 	 
 	 integer i;
 	 always @ (posedge clk) begin
-		 
-// $display("\nA1 : %d", A1);
-// $display("A2 : %d", A2);
-// $display("A3 : %d", A3);
-// $display("Сумма : %d", RAM[17]);
-// $display("16 : %d", RAM[18]);
-// $display("C1 : %d", RAM[1]);
-// $display("C2 : %d", RAM[15]);
-// $display("RD1 : %d", RD1);
-
 	   if (rst) 
 		for (i = 0; i < 32; i=i+1) 
 			RAM[i] <= 32'd0;
