@@ -1,4 +1,4 @@
-module riscv_decode
+module RiscvDecode
 (
   input   [31:0]               fetched_instr_i,
   output  [1:0]                ex_op_a_sel_o,
@@ -14,3 +14,4 @@ module riscv_decode
   output                       jal_o,
   output                       jarl_o
 );
+endmodule

@@ -1,6 +1,6 @@
-`timescale 1ns / 1ps
+`include "/home/drkwdck/VerilogHDL/src/miriscv_defines.v"
 
-`include "../rtl/miriscv_defines.v"
+`timescale 1ns / 1ps
 
 module tb_miriscv_decode_obf();
 
@@ -33,7 +33,7 @@ module tb_miriscv_decode_obf();
   reg                        dw4BF7GiQnff;
   reg                        s4fORqHpkpve;
 
-  miriscv_decode dut (
+  RiscvDecode dut (
     .fetched_instr_i  (UmWx5ulXQ5IP),
     .ex_op_a_sel_o    (I2r97V7muunE),
     .ex_op_b_sel_o    (R5si3NNGkJJI),
@@ -213,7 +213,7 @@ module tb_miriscv_decode_obf();
   integer XMLVHtniB4;
 
   initial begin
-    $timeformat(-9, 2, " ns");
+    $timeformat();
     XMLVHtniB4 = 0;
   end
 
@@ -318,5 +318,4 @@ module tb_miriscv_decode_obf();
       XMLVHtniB4 = XMLVHtniB4 + 1'b1;
     end
   endfunction
-
 endmodule
