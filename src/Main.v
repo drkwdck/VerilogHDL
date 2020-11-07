@@ -5,7 +5,7 @@ module Main (
 	output [31:0] HEX
 );
 
-reg [31:0] PC;
+reg signed [31:0] PC;
 reg [31:0] writeData;
 wire [31:0] current_instruction;
 wire [31:0] RD1;
@@ -41,7 +41,7 @@ RF rF(
 	.RD2 (RD2)
 );
 
-assign SE = {{24{current_instruction[7]}}, current_instruction[7:0] };
+assign SE = { {24{current_instruction[7]}}, current_instruction[7:0] };
 
 assign HEX=RD1;
 always @(*) begin
@@ -66,6 +66,6 @@ always @(posedge clk) begin
 	else if (!((comparisonResultO && current_instruction[30]) || current_instruction[31]))
 		PC <= PC + 32'd1 ; 
 	else
-		PC <= PC + (SE[31:0]);
+		PC <= $signed($signed(PC) + $signed(SE[31:0]));
 end
 endmodule

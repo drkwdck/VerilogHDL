@@ -5,6 +5,6 @@ module InstructionMemory(
 	output [31:0] RD
 );
 	reg [31:0] RAM [47:0];
-	initial $readmemb ("instructions.txt", RAM);
+	initial $readmemb ("instructions copy.txt", RAM);
 	assign RD = RAM[A];
 endmodule

@@ -47,6 +47,7 @@ module ALU(
 				`ALU_AND: begin
 					result = left & right;
 					comparison = 0;
+					$display(right);
 				end
 
 				`ALU_SRA: begin
@@ -86,7 +87,7 @@ module ALU(
 
 				`ALU_EQ:  begin 
 					result = (left == right)?1:0;
-					comparison = result ; 
+					comparison = result;
 				end
 
 				`ALU_LTS: begin
