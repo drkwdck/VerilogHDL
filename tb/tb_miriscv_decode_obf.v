@@ -1,6 +1,6 @@
-`include "/home/drkwdck/VerilogHDL/src/miriscv_defines.v"
-
 `timescale 1ns / 1ps
+
+`include "/home/drkwdck/VerilogHDL/src/miriscv_defines.v"
 
 module tb_miriscv_decode_obf();
 
@@ -125,8 +125,11 @@ module tb_miriscv_decode_obf();
     casez (U8wR)
       5'b0?000,
       5'b110?1,
-      5'b00101:
+      5'b00101: begin
         kQPPGtSqrrg0 = {1'b0, llOr} << 3;
+        if (U8wR[4] & ~U8wR[1] & |amn5)
+          sD7vxFgtY7jG = 1'b1;
+      end
 
       `OP_IMM_OPCODE: begin
         casez ({avHQ, amn5})
@@ -213,7 +216,6 @@ module tb_miriscv_decode_obf();
   integer XMLVHtniB4;
 
   initial begin
-    $timeformat();
     XMLVHtniB4 = 0;
   end
 
@@ -318,4 +320,5 @@ module tb_miriscv_decode_obf();
       XMLVHtniB4 = XMLVHtniB4 + 1'b1;
     end
   endfunction
+
 endmodule

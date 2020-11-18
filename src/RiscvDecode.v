@@ -1,187 +1,322 @@
-module RiscvDecode(
-input 	  [31:0] fetched_instr_i, 
-output reg [1:0] ex_op_a_sel_o, 
-output reg [2:0] ex_op_b_sel_o, 
-output reg [5:0] alu_op_o, 
-output reg 			 mem_req_o,
-output reg 			 mem_we_o, 
-output reg [2:0] mem_size_o,
-output reg 			 gpr_we_a_o, 
-output reg 			 wb_src_sel_o,
-output reg 			 illegal_instr_o, 
-output reg 			 branch_o, 
-output reg 			 jal_o,  
-output reg 			 jarl_o 
-);
+module RiscvDecode ( input   [31 : 0]  fetched_instr_i,//Инструкция для декодирования, считанная из памяти инструкций 
+output reg [1 : 0]    ex_op_a_sel_o,//Управляющий сигнал мультиплексора для выбора первого операнда АЛУ 
+output reg  [2 : 0]   ex_op_b_sel_o,//Управляющий сигнал мультиплексора для выбора второго операнда АЛУ 
+output reg  [`ALU_OP_WIDTH - 1 : 0]  alu_op_o,//Операция АЛУ  
+output reg mem_req_o,//Запрос на доступ к памяти (часть интерфейса памяти) 
+output  reg  mem_we_o,//Сигнал разрешения записи в память, «write enable» (при равенстве нулю происходит чтение) 
+output reg  [2 : 0]   mem_size_o,//Управляющий сигнал для выбора размера слова при чтении-записи в память (часть интерфейса памяти) 
+output  reg gpr_we_a_o,//Сигнал разрешения записи в регистровый файл 
+output  reg wb_src_sel_o,//Управляющий сигнал мультиплексора для выбора данных, записываемых в регистровый файл 
+output  reg illegal_instr_o,//Сигнал о некорректной инструкции (на схеме не отмечен) 
+output reg branch_o,//Сигнал об инструкции условного перехода 
+output reg  jal_o,//Сигнал об инструкции безусловного перехода jal 
+output  reg jarl_o ); //Сигнал об инструкции безусловного перехода jarl 
 
-wire [4:0]  opcode;
-wire [6:0]  funct7;
-wire [2:0]  funct3;
-reg [4:0]  rs1;
-reg [4:0]  rs2;
-reg [4:0]  rd;
+always@(*)
+begin
+	case(fetched_instr_i[6 : 0])
+	7'b0110011: // R-TYPE
+	begin
+		ex_op_a_sel_o = 2'b0;
+		ex_op_b_sel_o = 3'b0;				
+		mem_req_o = 1'b0;
+		mem_we_o = 1'b0;
+		mem_size_o = 1'b0;//idk TODO
+		gpr_we_a_o = 1'b1;
+		wb_src_sel_o = 1'b0;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b0;
+		jal_o = 1'b0;
+		jarl_o = 1'b0;
+		case(fetched_instr_i[14 : 12])		
+		3'b000: 
+			if(fetched_instr_i[31 : 25] == 7'b0)
+				alu_op_o = `ALU_ADD;//add
+			else if(fetched_instr_i[31 : 25] == 7'b0100000)//hex 20
+				alu_op_o = `ALU_SUB;//sub
+			else 
+				illegal_instr_o = 1'b1;
+		3'b001:	
+			if(fetched_instr_i[31 : 25] == 7'b0)
+				alu_op_o = `ALU_SLL; //shift left logical
+			else
+				illegal_instr_o = 1'b1;
+		3'b010:
+			if(fetched_instr_i[31 : 25] == 7'b0)
+				alu_op_o = `ALU_SLTS;  //a<b(LTS)
+			else
+				illegal_instr_o = 1'b1;
+		3'b011:
+		   if(fetched_instr_i[31 : 25] == 7'b0)
+				alu_op_o = `ALU_SLTU;//a<b(LTU)
+			else
+				illegal_instr_o = 1'b1;
+		3'b100:
+			if(fetched_instr_i[31 : 25] == 7'b0)
+				alu_op_o = `ALU_XOR;//xor
+			else
+				illegal_instr_o = 1'b1;
+		3'b101:
+			if(fetched_instr_i[31 : 25] == 7'b0)
+				alu_op_o = `ALU_SRL;//shift right logical
+			else if (fetched_instr_i[31 : 25] == 7'b0100000)//hex 20
+				alu_op_o = `ALU_SRA;//shift right arithmetic
+			else
+			illegal_instr_o = 1'b1;
+		3'b110:
+			if(fetched_instr_i[31 : 25] == 7'b0)
+				alu_op_o = `ALU_OR;//or
+			else
+				illegal_instr_o = 1'b1;
+		3'b111:
+			if(fetched_instr_i[31 : 25] == 7'b0)
+				alu_op_o = `ALU_AND;//and
+			else
+				illegal_instr_o = 1'b1;		
+		default:	
+			illegal_instr_o = 1'b1;		
+		endcase		
+	end
+	
+	7'b0010011:// I-TYPE
+	begin
+		ex_op_a_sel_o = 2'b00;
+		ex_op_b_sel_o = 3'b001;				
+		mem_req_o = 1'b0;
+		mem_we_o = 1'b0;
+		mem_size_o = 1'b0;//idk TODO
+		gpr_we_a_o = 1'b1;
+		wb_src_sel_o = 1'b0;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b0;
+		jal_o = 1'b0;
+		jarl_o = 1'b0;
+		case(fetched_instr_i[14 : 12])
+		3'b000:
+			alu_op_o = `ALU_ADD;//add		
+		3'b001:	
+			if(fetched_instr_i[31 : 25] == 7'b0)
+				alu_op_o = `ALU_SLL; //shift left logical
+			else
+				illegal_instr_o = 1'b1;
+		3'b010:
+			alu_op_o = `ALU_SLTS;//lts
+		3'b011:
+			alu_op_o = `ALU_SLTU;//ltu
+		3'b100:
+			alu_op_o = `ALU_XOR;//xor
+		3'b101:
+			if(fetched_instr_i[31 : 25] == 7'b0)
+				alu_op_o = `ALU_SRL;//shift right logical
+			else if (fetched_instr_i[31 : 25] == 7'b0000010)
+				alu_op_o = `ALU_SRA;//shift right arithmetic
+			else
+				illegal_instr_o = 1'b1;
+		3'b110:
+			alu_op_o = `ALU_OR;//or
+		3'b111:
+			alu_op_o = `ALU_AND;//and
+		default:
+			illegal_instr_o = 1'b1;
+		endcase	
+	end
+	
+	7'b0110111://lui
+	begin 
+		ex_op_a_sel_o = 2'b10;
+		ex_op_b_sel_o = 3'b010;				
+		mem_req_o = 1'b0;
+		mem_we_o = 1'b0;
+		mem_size_o = 1'b0;//idk TODO
+		gpr_we_a_o = 1'b1;
+		wb_src_sel_o = 1'b0;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b0;
+		jal_o = 1'b0;
+		jarl_o = 1'b0;
+		alu_op_o = `ALU_ADD;
+		
+	end
+	
+	7'b0000011://load from memory
+	begin
+		ex_op_a_sel_o = 2'b00;
+		ex_op_b_sel_o = 3'b001;				
+		mem_req_o = 1'b1;
+		mem_we_o = 1'b0;
+		gpr_we_a_o = 1'b1;
+		wb_src_sel_o = 1'b1;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b0;
+		jal_o = 1'b0;
+		jarl_o = 1'b0;
+		alu_op_o = `ALU_ADD;
+		
+		if(fetched_instr_i[14 : 12] < 3'b110 && fetched_instr_i[14 : 12] !=  3'b011)
+			mem_size_o = fetched_instr_i[14:12];
+		else
+			illegal_instr_o = 1'b1;
+			
+	end
+	
+	7'b0100011:// store data
+	begin
+		ex_op_a_sel_o = 2'b00;
+		ex_op_b_sel_o = 3'b011;				
+		mem_req_o = 1'b1;
+		mem_we_o = 1'b1;
+		gpr_we_a_o = 1'b0;
+		wb_src_sel_o = 1'b1;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b0;
+		jal_o = 1'b0;
+		jarl_o = 1'b0;
+		alu_op_o = `ALU_ADD;
+		
+		if(fetched_instr_i[14 : 12] < 3'b011)
+			mem_size_o = fetched_instr_i[14 : 12];
+		else
+			illegal_instr_o = 1'b1;	
+			
+	end
+	
+	7'b1100011://brach(if)
+	begin 
+		ex_op_a_sel_o = 2'b00;
+		ex_op_b_sel_o = 3'b000;	
+		mem_req_o = 1'b0;
+		mem_we_o = 1'b0;
+		mem_size_o = 1'b0;//idk TODO
+		gpr_we_a_o = 1'b0;
+		wb_src_sel_o = 1'b0;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b1;
+		jal_o = 1'b0;
+		jarl_o = 1'b0;
+		case(fetched_instr_i[14 : 12])//func3
+		3'b000:
+			alu_op_o = `ALU_EQ;
+		3'b001:
+			alu_op_o = `ALU_NE;
+		3'b100:
+			alu_op_o = `ALU_LTS;
+		3'b101:
+			alu_op_o = `ALU_GES;
+		3'b110:
+			alu_op_o = `ALU_LTU;
+		3'b111:
+			alu_op_o = `ALU_GEU;
+		default:
+			illegal_instr_o = 1'b1;
+		endcase
+	end
 
-assign opcode = fetched_instr_i[6:2];
-assign funct7 = fetched_instr_i[31:25];
-assign funct3 = fetched_instr_i[14:12];
+	7'b1101111://jal(rd=pc+4;pc+=imm)
+	begin
+		ex_op_a_sel_o = 2'b01;
+		ex_op_b_sel_o = 3'b100;				
+		mem_req_o = 1'b0;
+		mem_we_o = 1'b0;
+		mem_size_o = 1'b0;//idk TODO
+		gpr_we_a_o = 1'b1;
+		wb_src_sel_o = 1'b0;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b0;
+		jal_o = 1'b1;
+		jarl_o = 1'b0;
+		alu_op_o = `ALU_ADD;
+	end
 
-always @ ( * ) begin
-    illegal_instr_o = ~&fetched_instr_i[1:0];
-    wb_src_sel_o = (opcode ==`LOAD_OPCODE);
-    mem_req_o = (opcode == `LOAD_OPCODE || opcode == `STORE_OPCODE);     
-    mem_we_o = (opcode == `STORE_OPCODE); 
-    gpr_we_a_o = (opcode == `AUIPC_OPCODE || opcode == `OP_IMM_OPCODE || opcode == `LUI_OPCODE || opcode == `OP_OPCODE 
-                    || opcode == `JAL_OPCODE || opcode == `JALR_OPCODE || opcode == `LOAD_OPCODE); 
-    branch_o = (opcode == `BRANCH_OPCODE);
-    jal_o = (opcode == `JAL_OPCODE);
-	  jarl_o = (opcode == `JALR_OPCODE);
-	 
-    case (opcode)
-        `OP_OPCODE: begin
-            ex_op_a_sel_o = `OP_A_RS1;
-            ex_op_b_sel_o = `OP_B_RS2;
-
-            case ({funct7, funct3})
-                10'b0000000_000:
-                  alu_op_o = `ALU_ADD;
-                10'b0100000_000 : 
-                  alu_op_o = `ALU_SUB;
-                10'b0000000_001 : 
-                  alu_op_o = `ALU_SLL;
-                10'b0000000_010 : 
-                  alu_op_o = `ALU_SLTS;
-                10'b0000000_011 : 
-                  alu_op_o = `ALU_SLTU;
-                10'b0000000_100 : 
-                  alu_op_o = `ALU_XOR;
-                10'b0000000_101 : 
-                  alu_op_o = `ALU_SRL;
-                10'b0100000_101 : 
-                  alu_op_o = `ALU_SRA;
-                10'b0000000_110 : 
-                  alu_op_o = `ALU_OR;
-                10'b0000000_111 : 
-                  alu_op_o = `ALU_AND;
-                default: illegal_instr_o = 1'b1;
-            endcase
-        end
-
-        `OP_IMM_OPCODE: begin
-            ex_op_a_sel_o = `OP_A_RS1;
-            ex_op_b_sel_o = `OP_B_IMM_I;
-            case (funct3)
-                3'b000:
-                  alu_op_o = `ALU_ADD;
-                3'b011:
-                  alu_op_o = `ALU_SLTU;
-                3'b100:
-                  alu_op_o = `ALU_XOR;
-                3'b110:
-                  alu_op_o = `ALU_OR;
-                3'b111:
-                  alu_op_o = `ALU_AND;
-                3'b001: begin
-                    if (funct7 == 7'b0000000)
-                        alu_op_o = `ALU_SLL;
-                    else
-                        illegal_instr_o = 1'b1;
-                end
-                3'b010 : alu_op_o = `ALU_SLTS;
-                3'b101 : 
-                  case (funct7)
-                      7'b0000000 : alu_op_o = `ALU_SRL; 
-                      7'b0100000 : alu_op_o = `ALU_SRA;
-                      default: illegal_instr_o = 1'b1;
-                  endcase 
-                default: illegal_instr_o = 1'b1;
-            endcase
-        end
-
-        `LOAD_OPCODE: begin
-            alu_op_o = `ALU_ADD;
-            ex_op_a_sel_o = `OP_A_RS1;
-            ex_op_b_sel_o = `OP_B_IMM_I;
-            case (funct3)
-                3'b000: 
-                  mem_size_o = `LDST_B;
-                3'b001: 
-                  mem_size_o = `LDST_H;
-                3'b010: 
-                  mem_size_o = `LDST_W;
-                3'b100: 
-                  mem_size_o = `LDST_BU;
-                3'b101: 
-                  mem_size_o = `LDST_HU;
-                default:
-                  illegal_instr_o = 1'b1;
-            endcase
-        end
-
-        `STORE_OPCODE: begin
-            alu_op_o = `ALU_ADD;
-            ex_op_a_sel_o = `OP_A_RS1;
-            ex_op_b_sel_o = `OP_B_IMM_S;
-            case (funct3)
-                3'b000:
-                  mem_size_o  = `LDST_B;
-                3'b001:
-                  mem_size_o  = `LDST_H;
-                3'b010:
-                  mem_size_o  = `LDST_W;
-                default: 
-                  illegal_instr_o = 1'b1;
-            endcase
-        end
-
-        `BRANCH_OPCODE: begin
-            ex_op_a_sel_o = `OP_A_RS1;
-            ex_op_b_sel_o = `OP_B_RS2;
-            case (funct3)
-                3'b000:
-                  alu_op_o = `ALU_EQ;
-                3'b001:
-                  alu_op_o = `ALU_NE;
-                3'b100:
-                  alu_op_o = `ALU_LTS;
-                3'b101:
-                  alu_op_o = `ALU_GES;
-                3'b110:
-                  alu_op_o = `ALU_LTU;
-                3'b111:
-                  alu_op_o = `ALU_GEU;
-                default:
-                  illegal_instr_o = 1'b1;
-            endcase
-        end
-
-        `JAL_OPCODE: begin
-            ex_op_a_sel_o = `OP_A_CURR_PC;
-            ex_op_b_sel_o = `OP_B_INCR;
-            alu_op_o = `ALU_ADD;
-        end
-
-        `JALR_OPCODE: begin
-            ex_op_a_sel_o = `OP_A_CURR_PC;
-            ex_op_b_sel_o = `OP_B_INCR;
-            alu_op_o = `ALU_ADD;
-		  end
-
-        `LUI_OPCODE: begin
-            ex_op_a_sel_o = `OP_A_ZERO;
-            ex_op_b_sel_o = `OP_B_IMM_U;
-            alu_op_o = `ALU_ADD;
-        end
-
-        `AUIPC_OPCODE: begin
-            ex_op_a_sel_o = `OP_A_CURR_PC;
-            ex_op_b_sel_o = `OP_B_IMM_U;
-            alu_op_o = `ALU_ADD;
-        end
-
-        `MISC_MEM_OPCODE:;
-        `SYSTEM_OPCODE:;
-
-        default: illegal_instr_o = 1'b1;
-    endcase
+	7'b1100111://jalr(rd=pc+4;pc=rs1+imm)
+	begin
+		ex_op_a_sel_o = 2'b01;
+		ex_op_b_sel_o = 3'b100;				
+		mem_req_o = 1'b0;
+		mem_we_o = 1'b0;
+		mem_size_o = 1'b0;//idk TODO
+		gpr_we_a_o = 1'b1;
+		wb_src_sel_o = 1'b0;		
+		branch_o = 1'b0;
+		jal_o = 1'b0;		
+		jarl_o = 1'b1;
+		alu_op_o = `ALU_ADD;
+		if(fetched_instr_i[14 : 12]==3'b0)
+			illegal_instr_o = 1'b0;
+		else
+			illegal_instr_o = 1'b1;
+		
+	end
+	
+	7'b0001111:
+	begin
+		ex_op_a_sel_o = 2'b00;
+		ex_op_b_sel_o = 3'b000;				
+		mem_req_o = 1'b0;
+		mem_we_o = 1'b0;
+		mem_size_o = 1'b0;//idk TODO
+		gpr_we_a_o = 1'b0;
+		wb_src_sel_o = 1'b0;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b0;
+		jal_o = 1'b0;
+		jarl_o = 1'b0;
+		alu_op_o = `ALU_ADD;
+	end
+	
+	7'b1110011:
+	begin
+		ex_op_a_sel_o = 2'b00;
+		ex_op_b_sel_o = 3'b000;				
+		mem_req_o = 1'b0;
+		mem_we_o = 1'b0;
+		mem_size_o = 1'b0;//idk TODO
+		gpr_we_a_o = 1'b0;
+		wb_src_sel_o = 1'b0;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b0;
+		jal_o = 1'b0;
+		jarl_o = 1'b0;
+	end			
+	
+	7'b0100011:
+	begin
+		ex_op_a_sel_o = 2'b00;
+		ex_op_b_sel_o = 3'b000;				
+		mem_req_o = 1'b0;
+		mem_we_o = 1'b0;
+		mem_size_o = 1'b0;//idk TODO
+		gpr_we_a_o = 1'b0;
+		wb_src_sel_o = 1'b0;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b0;
+		jal_o = 1'b0;
+		jarl_o = 1'b0;
+	end
+	
+	7'b0010111:
+	begin
+		ex_op_a_sel_o = 2'b01;
+		ex_op_b_sel_o = 3'b010;				
+		mem_req_o = 1'b0;
+		mem_we_o = 1'b0;
+		mem_size_o = 1'b0;//idk TODO
+		gpr_we_a_o = 1'b1;
+		wb_src_sel_o = 1'b0;
+		illegal_instr_o = 1'b0;
+		branch_o = 1'b0;
+		jal_o = 1'b0;
+		jarl_o = 1'b0;
+		alu_op_o = `ALU_ADD;
+	end
+	
+	default:
+	begin
+		illegal_instr_o = 1'b1;
+		mem_we_o = 1'b0;
+		gpr_we_a_o = 1'b0;
+	end
+	
+	endcase
 end
+
 endmodule

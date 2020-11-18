@@ -22,7 +22,7 @@ reg [31:0] RAM [0:31];
 			RAM[i] <= 32'd0;
 	   else
 			if (WE3) RAM[A3] <= WD3;
-		// $display("%b", RAM[24]);
+		// $display("%b", RAM[2]);
 	 end
 
 endmodule

@@ -14,7 +14,7 @@ Main MainUnitTest(
   .HEX (HEX)
 );
 
-initial SW = 32'd30;
+initial SW = 10'b11_1011_1001;
 
 initial begin
   reset = 1;
