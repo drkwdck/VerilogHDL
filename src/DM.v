@@ -1,7 +1,7 @@
 module DM(
 input CLK,
 input WE,
-input [2:0] I,
+input [2:0] size,
 input [31:0] WD,
 input [31:0] A,
 output [31:0] RD
@@ -60,8 +60,8 @@ assign WOut[23:16] = Byte2[A[7:2]];
 assign WOut[15:8] = Byte1[A[7:2]];
 assign WOut[7:0] = Byte0[A[7:2]];
 
-MUX4to1 BHWSEL(
-.selector(I),
+SizeSelector sizeSelector(
+.selector(size),
 .S8(S8Out),
 .S16(S16Out),
 .W(WOut),
@@ -74,7 +74,7 @@ MUX4to1 BHWSEL(
 always @(posedge CLK)
 begin
 	if(WE) begin
-		case(I)
+		case(size)
 			SigByte: begin 
 						case(A[1:0])
 							2'b00: begin Byte0[A[7:2]] <= WD[7:0]; end
@@ -108,7 +108,7 @@ begin
 		endcase
 	end
 	
-	case(I)
+	case(size)
 		SigByte: begin
 					case(A[1:0])
 						2'b00: begin S8In <= Byte0[A[7:2]]; end

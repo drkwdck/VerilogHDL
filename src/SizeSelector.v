@@ -1,4 +1,4 @@
-module MUX4to1(
+module SizeSelector(
 input [2:0] selector,
 input [31:0] S8,
 input [31:0] S16,

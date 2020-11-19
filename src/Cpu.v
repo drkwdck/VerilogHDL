@@ -1,43 +1,20 @@
 module Cpu(
-//CPU control
 input CLK,
-input RESET,
-//Execution
-output [31:0] FromPC,
-input [31:0] CurInstr,
+input reset,
+output [31:0] pcLastState,
+input [31:0] currentInstrucntion,
 //Memory
-input [31:0] MemRD,
-output [31:0] MemWD,
-output [31:0] MemA,
+input [31:0] dataMemoryOutput,
+output [31:0] dataMemoryOut,
+output [31:0] dataMemoryAdress,
 output [2:0] MemSize,
 output MemWE,
-output IsError,
-
-//debug
-output [31:0] RFWD,
-output [4:0] RFWA,
-output [31:0] RFRS1,
-output [4:0] RFRS1A,
-output [31:0] RFRS2,
-output [4:0] RFRS2A,
-output RFWS,
-output RFWE,
-output [31:0] imm_I,
-output [31:0] imm_S,
-output [31:0] imm_J,
-output [31:0] imm_B,
-output [31:0] imm_UI,
-output MemReq,
-output [1:0] OpA,
-output [2:0] OpB,
-output [5:0] AluOp,
-output [31:0] AluResult
+output IsError
 );
 
 //PC and InstrMem wires
-wire [31:0] Instr = CurInstr;
+wire [31:0] Instr = currentInstrucntion;
 reg [31:0] ToPC;
-wire PCEN;
 
 //Register file wires
 wire [4:0] RA1 = Instr[19:15];
@@ -51,18 +28,16 @@ reg [31:0] RfWD;
 assign RFWD = RfWD;
 assign RFWA = WA;
 
-assign MemWD = RfRD2;
+assign dataMemoryOut = RfRD2;
 
-//Alu wires
 reg [31:0] OperandA;
 reg [31:0] OperandB;
 wire [5:0] Operation;
 wire [31:0] Result;
 wire ComparisonResult;
 
-assign MemA = Result;
+assign dataMemoryAdress = Result;
 
-//Immediates
 wire [31:0] ImmI;
 wire [31:0] ImmS;
 wire [31:0] ImmJ;
@@ -84,9 +59,8 @@ assign UImm[11:0] = 12'b0;
 
 assign imm_UI = UImm;
 
-//decode wires
 wire [1:0] OperatorASelector;
-wire [2:0] OperatorBSelector;
+wire [2:0] rigthOperand;
 wire RFWSSelector;
 wire IsBranch;
 wire IsJal;
@@ -95,12 +69,10 @@ wire IsJarl;
 assign jump = IsJal;
 assign branch = IsBranch;
 
-//Interface
 assign ReadData1 = RfRD1;
 assign ReadData2 = RfRD2;
 assign IsError = PCEN;
 
-//Other wires
 reg [31:0] NextInstr;
 wire BranchSelector = IsBranch & ComparisonResult;
 assign branch_selector = BranchSelector;
@@ -110,15 +82,14 @@ assign jump_selector = JumpSelector;
 
 
 PC ProgC(
-.EN(!PCEN),
-.RESET(RESET),
+.reset(reset),
 .CLK(CLK), 
 .IN(ToPC),
-.OUT(FromPC)
+.OUT(pcLastState)
  );
  
  register_file RF(
- .RESET(RESET),
+ .reset(reset),
  .CLK(CLK),
  .WE(RfWE),
  .WDA(WA),
@@ -145,19 +116,19 @@ assign RFRS2A = RA2;
 assign AluOp = Operation;
 assign AluResult = Result;
 riscv_decode MainDecoder(
-.fetched_instr_i(Instr), //Instruction
-.ex_op_a_sel_o(OperatorASelector), // Alu operand a
-.ex_op_b_sel_o(OperatorBSelector), //Alu operand b
-.alu_op_o(Operation), //Alu operation
-.mem_req_o(MemReq), //I don't give a fuck what is it
-.mem_we_o(MemWE), //Data memory WE
-.mem_size_o(MemSize), //Data memory size selector
-.gpr_we_a_o(RfWE), //Register file WE
-.wb_src_sel_o(RFWSSelector), //Register file WS
-.illegal_instr_o(PCEN), //Error
-.branch_o(IsBranch), //Branch if condition
-.jal_o(IsJal), //Jump and link with immediate
-.jarl_o(IsJarl) //Jump and link with register data
+.fetched_instr_i(Instr),
+.ex_op_a_sel_o(OperatorASelector),
+.ex_op_b_sel_o(rigthOperand),
+.alu_op_o(Operation),
+.mem_req_o(MemReq),
+.mem_we_o(MemWE),
+.mem_size_o(MemSize),
+.gpr_we_a_o(RfWE),
+.wb_src_sel_o(RFWSSelector),
+.illegal_instr_o(PCEN),
+.branch_o(IsBranch),
+.jal_o(IsJal),
+.jarl_o(IsJarl)
 );
 
 reg [31:0] BoJImm;
@@ -166,13 +137,13 @@ assign RFWS = RFWSSelector;
 assign RFWE = RfWE;
 
 assign OpA = OperatorASelector;
-assign OpB = OperatorBSelector;
+assign OpB = rigthOperand;
 
 always @(*)
 begin
 
 case(IsJarl)
-	0: begin ToPC <= NextInstr + FromPC; end
+	0: begin ToPC <= NextInstr + pcLastState; end
 	1: begin ToPC <= RfRD1 + ImmI; end
 endcase
 
@@ -188,11 +159,11 @@ endcase
 
 case(OperatorASelector)
 	2'd0: begin OperandA <= RfRD1; end
-	2'd1: begin OperandA <= FromPC; end
+	2'd1: begin OperandA <= pcLastState; end
 	2'd2: begin OperandA <= 32'b0; end
 endcase
 
-case(OperatorBSelector)
+case(rigthOperand)
 	3'd0: begin OperandB <= RfRD2; end
 	3'd1: begin OperandB <= ImmI; end
 	3'd2: begin OperandB <= UImm; end
@@ -202,7 +173,7 @@ endcase
 
 case(RFWSSelector)
 	0: begin RfWD <= Result; end
-	1: begin RfWD <= MemRD; end
+	1: begin RfWD <= dataMemoryOutput; end
 endcase
 
 end

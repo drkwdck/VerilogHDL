@@ -1,4 +1,4 @@
-`define RESET_ADDR 32'h00000000
+`define reset_ADDR 32'h00000000
 
 `define ALU_OP_WIDTH  6
 

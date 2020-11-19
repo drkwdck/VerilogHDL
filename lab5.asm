@@ -36,3 +36,8 @@ __start:
   add x2, x2, x1
   addi x2, x2, 8
   srli x2, x2, 4
+  sw x2, 0(x0)
+  nop
+  call End
+  End:
+   tail End
