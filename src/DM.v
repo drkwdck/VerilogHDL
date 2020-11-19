@@ -1,4 +1,4 @@
-module DataMemory(
+module DM(
 input CLK,
 input WE,
 input [2:0] I,
@@ -159,7 +159,7 @@ begin
 						endcase
 				end
 	endcase
-	
+	$display(Byte0[64'd0]);
 end
 
 

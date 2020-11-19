@@ -1,4 +1,4 @@
-module riscv_cpu(
+module Cpu(
 //CPU control
 input CLK,
 input RESET,
@@ -11,9 +11,7 @@ output [31:0] MemWD,
 output [31:0] MemA,
 output [2:0] MemSize,
 output MemWE,
-//Runtime state
 output IsError,
-output reg IsEnd,
 
 //debug
 output [31:0] RFWD,
@@ -206,13 +204,6 @@ case(RFWSSelector)
 	0: begin RfWD <= Result; end
 	1: begin RfWD <= MemRD; end
 endcase
-
-if(IsJal == 1 & ImmJ == 0 ) begin
-	IsEnd <= 1;
-end
-else begin
-	IsEnd <= 0;
-end
 
 end
  

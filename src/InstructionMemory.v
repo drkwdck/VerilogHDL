@@ -6,7 +6,7 @@ output [31:0] Instr
 reg [31:0] RAM [0:63];
 
 initial begin
-    $readmemh("Task.txt", RAM);
+    $readmemh("lab5Exec.txt", RAM);
 end
 
 assign Instr = RAM[A[7:2]];
