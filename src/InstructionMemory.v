@@ -1,10 +1,14 @@
 module InstructionMemory(
-	input clk,
-	input  WE,
-	input [31:0] A,
-	output [31:0] RD
+input [31:0] A,
+output [31:0] Instr
 );
-	reg [31:0] RAM [47:0];
-	initial $readmemb ("instructions.txt", RAM);
-	assign RD = RAM[A];
+
+reg [31:0] RAM [0:63];
+
+initial begin
+    $readmemh("Task.txt", RAM);
+end
+
+assign Instr = RAM[A[7:2]];
+
 endmodule
