@@ -4,8 +4,6 @@
 module CpuUnit();
 reg clk;
 reg reset;
-wire [31:0] pcLastState;
-wire [31:0] currentInstrucntion;
 wire [31:0] dataMemoryOut;
 wire [31:0] dataMemoryAdress;
 wire [2:0] MemSize;
@@ -14,17 +12,10 @@ wire MemWE;
 Cpu dut(
 .clk(clk),
 .reset(reset),
-.pcLastState(pcLastState),
-.currentInstrucntion(currentInstrucntion),
 .dataMemoryOut(dataMemoryOut),
 .dataMemoryAdress(dataMemoryAdress),
 .MemSize(MemSize),
 .MemWE(MemWE)
-);
-
-InstructionMemory Instructions(
-.A(pcLastState), 
-.Instr(currentInstrucntion)
 );
 
 initial begin

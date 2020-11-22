@@ -1,9 +1,8 @@
 module Cpu(
 input clk,
 input reset,
-output [31:0] pcLastState,
-input [31:0] currentInstrucntion,
-// input [31:0] dataMemoryOutput,
+// output [31:0] pcLastState,
+// input [31:0] currentInstrucntion,
 output [31:0] dataMemoryOut,
 output [31:0] dataMemoryAdress,
 output [2:0] MemSize,
@@ -11,11 +10,17 @@ output MemWE,
 output IsError
 );
 
-//PC and InstrMem wires
+wire [31:0] pcLastState;
+wire [31:0] currentInstrucntion;
+
+InstructionMemory Instructions(
+.A(pcLastState), 
+.Instr(currentInstrucntion)
+);
+
 wire [31:0] Instr = currentInstrucntion;
 reg [31:0] ToPC;
 
-//Register file wires
 wire [4:0] RA1 = Instr[19:15];
 wire [4:0] RA2 = Instr[24:20];
 wire [4:0] WA = Instr[11:7];
