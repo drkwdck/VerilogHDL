@@ -1,22 +1,22 @@
 module PC(
 input reset,
-input CLK,
+input clk,
 input [31:0] IN,
 output [31:0] OUT
 );
 
-reg [31:0] CUR;
+reg [31:0] PC;
 
-assign OUT = CUR;
+assign OUT = PC;
 
-always @ (posedge CLK or posedge reset)
+always @ (posedge clk or posedge reset)
 begin
 
 	if(reset) begin
-		CUR <= 32'b00000000000000000000000000000000;
+		PC <= 32'b00000000000000000000000000000000;
 	end
 	else begin
-	CUR <= IN;
+	PC <= IN;
 	end
 end
 

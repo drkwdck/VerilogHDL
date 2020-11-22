@@ -1,9 +1,8 @@
 module Cpu(
-input CLK,
+input clk,
 input reset,
 output [31:0] pcLastState,
 input [31:0] currentInstrucntion,
-//Memory
 input [31:0] dataMemoryOutput,
 output [31:0] dataMemoryOut,
 output [31:0] dataMemoryAdress,
@@ -79,18 +78,24 @@ assign branch_selector = BranchSelector;
 wire JumpSelector = IsJal | BranchSelector;
 assign jump_selector = JumpSelector;
 
+reg [31:0] PC;
+assign pcLastState = PC;
+always @ (posedge clk or posedge reset)
+begin
+
+	if(reset) begin
+		PC <= 32'b00000000000000000000000000000000;
+	end
+	else begin
+	PC <= ToPC;
+	end
+end
 
 
-PC ProgC(
-.reset(reset),
-.CLK(CLK), 
-.IN(ToPC),
-.OUT(pcLastState)
- );
- 
+
  register_file RF(
  .reset(reset),
- .CLK(CLK),
+ .clk(clk),
  .WE(RfWE),
  .WDA(WA),
  .RDA1(RA1),

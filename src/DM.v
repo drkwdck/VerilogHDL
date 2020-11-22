@@ -1,5 +1,5 @@
 module DM(
-input CLK,
+input clk,
 input WE,
 input [2:0] size,
 input [31:0] WD,
@@ -71,7 +71,7 @@ SizeSelector sizeSelector(
 );
 
 
-always @(posedge CLK)
+always @(posedge clk)
 begin
 	if(WE) begin
 		case(size)

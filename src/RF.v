@@ -1,6 +1,6 @@
 module register_file(
 input reset,
-input CLK,
+input clk,
 input WE,
 input [4:0] WDA,
 input [4:0] RDA1,
@@ -17,7 +17,7 @@ assign RD2 = RAM[RDA2];
 
 
 integer i;
-always @ (posedge CLK or posedge reset)
+always @ (posedge clk or posedge reset)
 begin
 	RAM[5'b0] <= 32'b0;
 

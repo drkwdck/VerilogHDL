@@ -11,10 +11,9 @@ wire [31:0] dataMemoryOut;
 wire [31:0] dataMemoryAdress;
 wire [2:0] MemSize;
 wire MemWE;
-wire IsError;
 
 Cpu dut(
-.CLK(clk),
+.clk(clk),
 .reset(reset),
 .pcLastState(pcLastState),
 .currentInstrucntion(currentInstrucntion),
@@ -22,12 +21,11 @@ Cpu dut(
 .dataMemoryOut(dataMemoryOut),
 .dataMemoryAdress(dataMemoryAdress),
 .MemSize(MemSize),
-.MemWE(MemWE),
-.IsError(IsError)
+.MemWE(MemWE)
 );
 
 DM data(
-.CLK(clk),
+.clk(clk),
 .WE(MemWE),
 .size(MemSize),
 .WD(dataMemoryOut),
@@ -45,7 +43,7 @@ reset = 1; #1;
 clk = 0; #1;
 clk = 1; #1;
 reset = 0; #1;
-while(!IsError)
+while(1)
 	begin
 	clk = 0; #1;
 	clk = 1; #1;
