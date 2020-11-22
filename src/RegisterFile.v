@@ -1,4 +1,4 @@
-module register_file(
+module RegisterFile(
 input reset,
 input clk,
 input WE,

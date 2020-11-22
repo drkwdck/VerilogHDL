@@ -75,7 +75,6 @@ assign branch = IsBranch;
 
 assign ReadData1 = RfRD1;
 assign ReadData2 = RfRD2;
-assign IsError = PCEN;
 
 reg [31:0] NextInstr;
 wire BranchSelector = IsBranch & ComparisonResult;
@@ -98,7 +97,7 @@ end
 
 
 
- register_file RF(
+ RegisterFile RF(
  .reset(reset),
  .clk(clk),
  .WE(RfWE),
@@ -151,7 +150,7 @@ assign OpB = rigthOperand;
 
 wire [31:0] dataMemoryOutput;
 
-DM data(
+DataMemory data(
 .clk(clk),
 .WE(MemWE),
 .size(MemSize),
