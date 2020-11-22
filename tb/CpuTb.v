@@ -6,7 +6,6 @@ reg clk;
 reg reset;
 wire [31:0] pcLastState;
 wire [31:0] currentInstrucntion;
-wire [31:0] dataMemoryOutput;
 wire [31:0] dataMemoryOut;
 wire [31:0] dataMemoryAdress;
 wire [2:0] MemSize;
@@ -17,20 +16,10 @@ Cpu dut(
 .reset(reset),
 .pcLastState(pcLastState),
 .currentInstrucntion(currentInstrucntion),
-.dataMemoryOutput(dataMemoryOutput),
 .dataMemoryOut(dataMemoryOut),
 .dataMemoryAdress(dataMemoryAdress),
 .MemSize(MemSize),
 .MemWE(MemWE)
-);
-
-DM data(
-.clk(clk),
-.WE(MemWE),
-.size(MemSize),
-.WD(dataMemoryOut),
-.A(dataMemoryAdress),
-.RD(dataMemoryOutput)
 );
 
 InstructionMemory Instructions(

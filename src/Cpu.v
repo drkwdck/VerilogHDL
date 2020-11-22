@@ -3,7 +3,7 @@ input clk,
 input reset,
 output [31:0] pcLastState,
 input [31:0] currentInstrucntion,
-input [31:0] dataMemoryOutput,
+// input [31:0] dataMemoryOutput,
 output [31:0] dataMemoryOut,
 output [31:0] dataMemoryAdress,
 output [2:0] MemSize,
@@ -144,43 +144,53 @@ assign RFWE = RfWE;
 assign OpA = OperatorASelector;
 assign OpB = rigthOperand;
 
-always @(*)
-begin
+wire [31:0] dataMemoryOutput;
 
-case(IsJarl)
-	0: begin ToPC <= NextInstr + pcLastState; end
-	1: begin ToPC <= RfRD1 + ImmI; end
-endcase
+DM data(
+.clk(clk),
+.WE(MemWE),
+.size(MemSize),
+.WD(dataMemoryOut),
+.A(dataMemoryAdress),
+.RD(dataMemoryOutput)
+);
 
-case(JumpSelector)
-	0: begin NextInstr <= 32'h00000004; end
-	1: begin NextInstr <= BoJImm; end
-endcase
 
-case(IsBranch)
-	0: begin BoJImm <= ImmJ; end
-	1: begin BoJImm <= ImmB; end
-endcase
 
-case(OperatorASelector)
-	2'd0: begin OperandA <= RfRD1; end
-	2'd1: begin OperandA <= pcLastState; end
-	2'd2: begin OperandA <= 32'b0; end
-endcase
+always @(*) begin
+	case(IsJarl)
+		0: begin ToPC <= NextInstr + pcLastState; end
+		1: begin ToPC <= RfRD1 + ImmI; end
+	endcase
 
-case(rigthOperand)
-	3'd0: begin OperandB <= RfRD2; end
-	3'd1: begin OperandB <= ImmI; end
-	3'd2: begin OperandB <= UImm; end
-	3'd3: begin OperandB <= ImmS; end
-	3'd4: begin OperandB <= 32'h00000004; end
-endcase
+	case(JumpSelector)
+		0: begin NextInstr <= 32'h00000004; end
+		1: begin NextInstr <= BoJImm; end
+	endcase
 
-case(RFWSSelector)
-	0: begin RfWD <= Result; end
-	1: begin RfWD <= dataMemoryOutput; end
-endcase
+	case(IsBranch)
+		0: begin BoJImm <= ImmJ; end
+		1: begin BoJImm <= ImmB; end
+	endcase
 
+	case(OperatorASelector)
+		2'd0: begin OperandA <= RfRD1; end
+		2'd1: begin OperandA <= pcLastState; end
+		2'd2: begin OperandA <= 32'b0; end
+	endcase
+
+	case(rigthOperand)
+		3'd0: begin OperandB <= RfRD2; end
+		3'd1: begin OperandB <= ImmI; end
+		3'd2: begin OperandB <= UImm; end
+		3'd3: begin OperandB <= ImmS; end
+		3'd4: begin OperandB <= 32'h00000004; end
+	endcase
+
+	case(RFWSSelector)
+		0: begin RfWD <= Result; end
+		1: begin RfWD <= dataMemoryOutput; end
+	endcase
 end
  
- endmodule
+endmodule
