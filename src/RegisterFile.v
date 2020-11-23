@@ -28,7 +28,9 @@ begin
 		end
 	else
 	if(WE & WDA > 0) begin 
-	RAM[WDA] <= WD;
+		// $display("\nWrite Data: %d",WD);
+		// $display("Addrs: %d\n", WDA);
+		RAM[WDA] <= WD;
 	end
 end
 		
