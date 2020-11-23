@@ -18,15 +18,17 @@ Cpu dut(
 .MemWE(MemWE)
 );
 
+integer i = 0;
 initial begin
 reset = 1; #1;
 clk = 0; #1;
 clk = 1; #1;
 reset = 0; #1;
-while(1)
+while(i < 100)
 	begin
 	clk = 0; #1;
 	clk = 1; #1;
+	i = i + 1;
 	end
 end
 
