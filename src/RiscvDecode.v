@@ -146,7 +146,7 @@ case(opcode)
 				jarl_o <= 0;
 				branch_o <= 0;
 				
-				case(funct3) // Selection of operation
+				case(funct3) 
 					3'h0: begin 
 									alu_op_o <= 6'b011000;
 									illegal_instr_o <= 0;

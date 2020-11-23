@@ -35,14 +35,24 @@ reg [7:0] secondByte [0:63];
 reg [7:0] thirdByte [0:63];
 
 integer i;
+reg [31:0] temporaryReader[0:15];
 initial begin
-for (i = 0; i < 64; i = i + 1) begin
-	zerByte[i] = 8'd0;
-	firtsByte[i] = 8'd0;
-	secondByte[i] = 8'd0;
-	thirdByte[i] = 8'd0;
-end
-$readmemb("load_consts.txt", zerByte);
+	for (i = 0; i < 64; i = i + 1) begin
+		zerByte[i] = 8'd0;
+		firtsByte[i] = 8'd0;
+		secondByte[i] = 8'd0;
+		thirdByte[i] = 8'd0;
+		temporaryReader[i] = 64'd0;
+	end
+
+	$readmemb("load_consts.txt", temporaryReader);
+
+	for (i = 0; i < 64; i = i + 1) begin
+		zerByte[i] = temporaryReader[i][7:0];
+		firtsByte[i] = temporaryReader[i][15:8];
+		secondByte[i] = temporaryReader[i][23:16];
+		thirdByte[i] = temporaryReader[i][31:24];
+	end
 end
 
 localparam SigByte = 3'd0;
@@ -118,7 +128,7 @@ begin
 					end
 		endcase
 	end
-	
+
 	case(size)
 		SigByte: begin
 					case(A[1:0])
@@ -169,9 +179,8 @@ begin
 										end
 						endcase
 				end
+		
 	endcase
 	$display(zerByte[64'd0]);
 end
-
-
 endmodule
