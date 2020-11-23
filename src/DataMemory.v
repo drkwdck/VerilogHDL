@@ -121,7 +121,6 @@ begin
 						endcase
 					end
 			Word: begin
-				$display("Я ПИШУ %d", WD);
 						zerByte[A[7:2]] <= WD[7:0];
 						firtsByte[A[7:2]] <= WD[15:8];
 						secondByte[A[7:2]] <= WD[23:16];
