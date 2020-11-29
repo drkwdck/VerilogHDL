@@ -3,13 +3,13 @@
 .text
 __start:
   call func
-  Slovo:
+  end:
   nop  
-  jal x18, Slovo
+  jal x18, end
   
   func:
   li x9, 0
-  li x10, 64
+  li x10, 60
   
   beginn:  
   blt x10, x9, exit
