@@ -46,4 +46,10 @@ module tb_miriscv_top();
 		#20;
 	end	
 
+initial begin
+	$dumpfile("/home/drkwdck/VerilogHDL/tb.vcd");
+   $dumpvars(0,tb_miriscv_top);
+
+end
+
 endmodule
