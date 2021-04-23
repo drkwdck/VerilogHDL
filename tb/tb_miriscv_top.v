@@ -12,7 +12,7 @@ module tb_miriscv_top();
 
   miriscv_top #(
     .RAM_SIZE       ( RAM_SIZE           ),
-    .RAM_INIT_FILE  ( "/home/drkwdck/VerilogHDL/ram_samples.txt" )
+    .RAM_INIT_FILE  ( "./ram_samples.txt" )
   ) dut (
     .clk_i    ( clk ),
     .rst_n_i  ( rst )
@@ -47,7 +47,7 @@ module tb_miriscv_top();
 	end	
 
 initial begin
-	$dumpfile("/home/drkwdck/VerilogHDL/tb.vcd");
+	$dumpfile("./tb.vcd");
    $dumpvars(0,tb_miriscv_top);
 
 end

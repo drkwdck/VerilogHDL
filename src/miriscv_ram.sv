@@ -45,7 +45,8 @@ module miriscv_ram
   assign data_gnt_o = data_req_i;
 
   always@(posedge clk_i) begin
-    $display(mem[86]);
+    $display("\nmean of first array: %d", mem[85]);
+    $display("\nmean of second array: %d", mem[86]);
     if(rst_n_i) begin
       data_rvalid_o <= 1'b0;
       data_rdata_o  <= 32'b0;
